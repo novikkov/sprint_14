@@ -47,17 +47,19 @@ module.exports.createUser = (req, res) => {
     email,
     password,
   } = req.body;
-
-  bcrypt.hash(password, 10)
-    .then((hash) => User.create({
-      name,
-      about,
-      avatar,
-      email,
-      password: hash,
-    }))
-    .then((user) => res.status(201).send({ data: user }))
-    .catch(() => {
-      res.status(400).send({ message: 'Bad request' });
-    });
+  if (password.length > 6) {
+    bcrypt.hash(password, 10)
+      .then((hash) => User.create({
+        name,
+        about,
+        avatar,
+        email,
+        password: hash,
+      }))
+      .then((user) => User.findById({ _id: user._id }))
+      .then((user) => res.send({ data: user }))
+      .catch(() => {
+        res.status(400).send({ message: 'Данный email уже зарегистрирован' });
+      });
+  }
 };

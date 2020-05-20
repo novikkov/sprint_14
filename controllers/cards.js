@@ -35,3 +35,19 @@ module.exports.deleteCard = (req, res) => {
       }
     });
 };
+
+module.exports.deleteCard = (req, res) => {
+  Card.findByIdAndRemove(req.params.id)
+    .then((card) => {
+      // eslint-disable-next-line eqeqeq
+      if (card && (req.user._id == card.owner)) {
+        return res.send({ message: 'Карточка удалена' });
+      }
+      return Promise.reject(new Error('Не ваша карточка'));
+    })
+    .catch((err) => {
+      if (err) {
+        res.status(400).send({ message: `Карточки с id: ${req.params.id} не существует` });
+      }
+    });
+};
