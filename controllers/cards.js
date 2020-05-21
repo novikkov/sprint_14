@@ -20,34 +20,15 @@ module.exports.createCard = (req, res) => {
     });
 };
 
-module.exports.deleteCard = (req, res) => {
-  Card.findByIdAndRemove(req.params.id)
-    .then((user) => {
-      if (user) {
-        res.send({ data: user });
-      } else {
-        res.status(400).send({ message: `Карточки с id: ${req.params.id} не существует` });
-      }
-    })
-    .catch((err) => {
-      if (err) {
-        res.status(400).send({ message: `Карточки с id: ${req.params.id} не существует` });
-      }
-    });
-};
-
-module.exports.deleteCard = (req, res) => {
-  Card.findByIdAndRemove(req.params.id)
+module.exports.deleteCard = (req, res, next) => {
+  Card.findByIdAndDelete(req.params.cardId)
     .then((card) => {
       // eslint-disable-next-line eqeqeq
       if (card && (req.user._id == card.owner)) {
-        return res.send({ message: 'Карточка удалена' });
+        return res.send({ message: 'Карточка удалена', data: card });
       }
+
       return Promise.reject(new Error('Не ваша карточка'));
     })
-    .catch((err) => {
-      if (err) {
-        res.status(400).send({ message: `Карточки с id: ${req.params.id} не существует` });
-      }
-    });
+    .catch((err) => next(err));
 };

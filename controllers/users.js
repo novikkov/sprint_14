@@ -25,21 +25,21 @@ module.exports.getUsers = (req, res) => {
 };
 
 module.exports.getUserById = (req, res) => {
-  User.findById(req.params.id)
+  User.findById(req.params.userId)
     .then((user) => {
       if (user) {
         res.send({ data: user });
       } else {
-        res.status(404).send({ message: `Пользователя с данным id: ${req.params.id} не существует` });
+        res.status(404).send({ message: `Пользователя с данным id: ${req.params.userId} не существует` });
       }
     })
     .catch(() => {
-      res.status(400).send({ message: `Пользователя с данным id: ${req.params.id} не существует` });
+      res.status(400).send({ message: `Пользователя с данным id: ${req.params.userId} не существует` });
     });
 };
 
 
-module.exports.createUser = (req, res) => {
+module.exports.createUser = (req, res, next) => {
   const {
     name,
     about,
@@ -47,7 +47,7 @@ module.exports.createUser = (req, res) => {
     email,
     password,
   } = req.body;
-  if (password.length > 6) {
+  if (password.length > 7 && password.match(/[a-z0-9]/i)) {
     bcrypt.hash(password, 10)
       .then((hash) => User.create({
         name,
@@ -56,10 +56,13 @@ module.exports.createUser = (req, res) => {
         email,
         password: hash,
       }))
-      .then((user) => User.findById({ _id: user._id }))
-      .then((user) => res.send({ data: user }))
-      .catch(() => {
-        res.status(400).send({ message: 'Данный email уже зарегистрирован' });
-      });
+      .then(() => res.send({
+        name,
+        about,
+        avatar,
+        email,
+      }))
+      .catch((err) => next(err));
   }
+  res.status(400).send({ message: 'Короткий или не правильный формат пароля' });
 };
