@@ -64,5 +64,5 @@ module.exports.createUser = (req, res, next) => {
       }))
       .catch((err) => next(err));
   }
-  res.status(400).send({ message: 'Короткий или не правильный формат пароля' });
+  // res.status(400).send({ message: 'Короткий или не правильный формат пароля' });
 };

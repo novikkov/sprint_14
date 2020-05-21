@@ -21,14 +21,21 @@ module.exports.createCard = (req, res) => {
 };
 
 module.exports.deleteCard = (req, res, next) => {
-  Card.findByIdAndDelete(req.params.cardId)
+  Card.findById(req.params.cardId)
     .then((card) => {
-      // eslint-disable-next-line eqeqeq
-      if (card && (req.user._id == card.owner)) {
-        return res.send({ message: 'Карточка удалена', data: card });
+      const { owner } = card;
+      return owner;
+    })
+    .then((owner) => {
+      const ownerStr = JSON.stringify(owner).slice(1, -1);
+
+      if (req.user._id !== ownerStr) {
+        return Promise.reject(new Error('Не ваша карточка'));
       }
 
-      return Promise.reject(new Error('Не ваша карточка'));
+      Card.findByIdAndRemove(req.params.id)
+        .then((user) => res.send({ data: user }))
+        .catch((err) => res.status(500).send({ message: err.message }));
     })
     .catch((err) => next(err));
 };
