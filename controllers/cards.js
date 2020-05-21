@@ -33,7 +33,7 @@ module.exports.deleteCard = (req, res, next) => {
         return Promise.reject(new Error('Не ваша карточка'));
       }
 
-      Card.findByIdAndRemove(req.params.id)
+      Card.findByIdAndRemove(req.params.cardId)
         .then((user) => res.send({ data: user }))
         .catch((err) => res.status(500).send({ message: err.message }));
     })
