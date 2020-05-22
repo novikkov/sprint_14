@@ -47,6 +47,7 @@ module.exports.createUser = (req, res, next) => {
     email,
     password,
   } = req.body;
+
   if (password.length > 7 && password.match(/[a-z0-9]/i)) {
     bcrypt.hash(password, 10)
       .then((hash) => User.create({

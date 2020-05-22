@@ -36,10 +36,20 @@ app.use(auth);
 app.use('/cards', require('./routes/cards'));
 app.use('/users', require('./routes/users'));
 
+app.use((err, req, res, next) => {
+  const isValidationError = err.message.indexOf('ValidationError');
+  const isNotFound = err.message.indexOf('not found');
+
+  if (err.message && (isValidationError || isNotFound)) {
+    res.status(404).send({ message: err.message });
+  }
+
+  res.status(500).send({ message: err.stack });
+});
+
 app.use('/', (req, res) => {
   res.status(404).json({ message: 'Запрашиваемый ресурс не найден' });
 });
-
 
 app.listen(PORT, () => {
   console.log(`App listening on port ${PORT}`);
