@@ -20,22 +20,19 @@ module.exports.createCard = (req, res) => {
     });
 };
 
-module.exports.deleteCard = (req, res, next) => {
+module.exports.deleteCard = (req, res) => {
   Card.findById(req.params.cardId)
     .then((card) => {
-      const { owner } = card;
-      return owner;
-    })
-    .then((owner) => {
-      const ownerStr = JSON.stringify(owner).slice(1, -1);
-
-      if (req.user._id !== ownerStr) {
-        return Promise.reject(new Error('Не ваша карточка'));
+      if (card) {
+        if (req.user._id.toString() === card.owner.toString()) {
+          Card.deleteOne(card)
+            .then(() => res.send({ message: 'Карточка успешно удалена' }));
+        } else {
+          res.status(404).send({ message: 'Нельзя удалить чужую карточку' });
+        }
+      } else {
+        res.status(404).send({ message: 'Карточка не найдена' });
       }
-
-      Card.findByIdAndRemove(req.params.cardId)
-        .then((user) => res.send({ data: user }))
-        .catch((err) => res.status(500).send({ message: err.message }));
     })
-    .catch((err) => next(err));
+    .catch((err) => res.status(500).send({ message: err.message }));
 };
