@@ -16,7 +16,7 @@ module.exports.createCard = (req, res) => {
   Card.create({ name, link, owner })
     .then((cards) => res.send({ data: cards }))
     .catch((err) => {
-      res.status(400).send({ message: err.message });
+      res.status(500).send({ message: err.message });
     });
 };
 
@@ -28,7 +28,7 @@ module.exports.deleteCard = (req, res) => {
           Card.deleteOne(card)
             .then(() => res.send({ message: 'Карточка успешно удалена' }));
         } else {
-          res.status(404).send({ message: 'Нельзя удалить чужую карточку' });
+          res.status(403).send({ message: 'Нельзя удалить чужую карточку' });
         }
       } else {
         res.status(404).send({ message: 'Карточка не найдена' });

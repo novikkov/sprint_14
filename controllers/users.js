@@ -12,7 +12,7 @@ module.exports.login = (req, res) => {
       });
     })
     .catch((err) => {
-      res.status(401).send({ message: err.message });
+      res.status(500).send({ message: err.message });
     });
 };
 
@@ -33,8 +33,8 @@ module.exports.getUserById = (req, res) => {
         res.status(404).send({ message: `Пользователя с данным id: ${req.params.userId} не существует` });
       }
     })
-    .catch(() => {
-      res.status(400).send({ message: `Пользователя с данным id: ${req.params.userId} не существует` });
+    .catch((err) => {
+      res.status(500).send({ message: err.message });
     });
 };
 
