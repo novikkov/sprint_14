@@ -41,10 +41,10 @@ app.use((err, req, res, next) => {
   const isNotFound = err.message.indexOf('not found');
 
   if (err.message && (isValidationError || isNotFound)) {
-    res.status(404).send({ message: err.message });
+    res.status(400).send({ message: err.message });
+  } else {
+    res.status(500).send({ message: err.stack });
   }
-
-  res.status(500).send({ message: err.stack });
 });
 
 app.use('/', (req, res) => {
